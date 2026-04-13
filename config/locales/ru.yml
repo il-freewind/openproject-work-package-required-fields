@@ -1,0 +1,6 @@
+﻿ru:
+  openproject:
+    plugins:
+      openproject_work_package_required_fields:
+        name: "Обязательные поля пакета работ"
+        description: "Плагин для настройки обязательных полей пакета работ в OpenProject"

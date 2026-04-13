@@ -1,0 +1,6 @@
+en:
+  openproject:
+    plugins:
+      openproject_work_package_required_fields:
+        name: "Work package required fields"
+        description: "Conditional required field rules for OpenProject work packages"

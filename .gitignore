@@ -1,0 +1,14 @@
+.bundle/
+/coverage/
+/log/
+/pkg/
+/tmp/
+/.idea/
+/.vscode/
+*.gem
+*.rbc
+*.sassc
+*.sqlite3
+*.swp
+*.swo
+
