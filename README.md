@@ -35,11 +35,6 @@ gem "openproject-work-package-required-fields", path: "../openproject-work-packa
 gem "openproject-work-package-required-fields", path: "../openproject-work-package-required-fields"
 ```
 
-## Версия Ruby
-
-Для OpenProject 17 используйте ту же версию Ruby, что и в целевой установке OpenProject.
-На текущий момент рекомендуемая версия: `Ruby 3.4.7`.
-
 ## Next Steps
 
 - define which work package fields become required for each rule
