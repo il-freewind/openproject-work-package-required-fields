@@ -1,0 +1,31 @@
+<% html_title I18n.t("openproject_work_package_required_fields.admin.title") %>
+
+<h2><%= I18n.t("openproject_work_package_required_fields.admin.title") %></h2>
+<p><%= I18n.t("openproject_work_package_required_fields.admin.description") %></p>
+
+<%= form_with url: admin_work_package_required_fields_settings_path, method: :put, local: true do %>
+  <table class="generic-table">
+    <thead>
+      <tr>
+        <th><%= I18n.t("openproject_work_package_required_fields.admin.table.enabled") %></th>
+        <th><%= Project.model_name.human %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @projects.each do |project| %>
+        <tr>
+          <td>
+            <%= check_box_tag "enabled_project_ids[]", project.id, @enabled_project_ids.include?(project.id), id: "enabled_project_#{project.id}" %>
+          </td>
+          <td>
+            <%= label_tag "enabled_project_#{project.id}", project.name %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <p class="form--actions">
+    <%= submit_tag I18n.t(:button_save) %>
+  </p>
+<% end %>

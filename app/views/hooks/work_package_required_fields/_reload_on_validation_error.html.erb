@@ -1,0 +1,145 @@
+<%= javascript_tag nonce: true do %>
+  (function () {
+    var storageKey = "openproject_work_package_required_fields.validation_error";
+    var markers = [
+      "cannot be changed until the required fields are filled in",
+      "нельзя изменить, пока не заполнены обязательные поля"
+    ];
+
+    function ready(callback) {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", callback, { once: true });
+      } else {
+        callback();
+      }
+    }
+
+    function stringContainsMarker(value) {
+      if (typeof value !== "string") {
+        return false;
+      }
+
+      return markers.some(function (marker) {
+        return value.indexOf(marker) !== -1;
+      });
+    }
+
+    function findRequiredFieldsMessage(value) {
+      if (!value) {
+        return null;
+      }
+
+      if (stringContainsMarker(value)) {
+        return value;
+      }
+
+      if (Array.isArray(value)) {
+        for (var i = 0; i < value.length; i += 1) {
+          var arrayMessage = findRequiredFieldsMessage(value[i]);
+          if (arrayMessage) {
+            return arrayMessage;
+          }
+        }
+      }
+
+      if (typeof value === "object") {
+        for (var key in value) {
+          if (Object.prototype.hasOwnProperty.call(value, key)) {
+            var objectMessage = findRequiredFieldsMessage(value[key]);
+            if (objectMessage) {
+              return objectMessage;
+            }
+          }
+        }
+      }
+
+      return null;
+    }
+
+    function messageFromBody(body) {
+      if (!body || !stringContainsMarker(body)) {
+        return null;
+      }
+
+      try {
+        return findRequiredFieldsMessage(JSON.parse(body)) || body;
+      } catch (error) {
+        return body;
+      }
+    }
+
+    function reloadWithMessage(message) {
+      if (!message || sessionStorage.getItem(storageKey)) {
+        return;
+      }
+
+      sessionStorage.setItem(storageKey, message);
+      window.location.reload();
+    }
+
+    function showStoredMessage() {
+      var message = sessionStorage.getItem(storageKey);
+
+      if (!message) {
+        return;
+      }
+
+      sessionStorage.removeItem(storageKey);
+
+      ready(function () {
+        var banner = document.createElement("div");
+        banner.setAttribute("role", "alert");
+        banner.style.background = "#ffe3e3";
+        banner.style.border = "1px solid #d1242f";
+        banner.style.borderRadius = "4px";
+        banner.style.color = "#24292f";
+        banner.style.margin = "12px";
+        banner.style.padding = "12px 16px";
+        banner.style.position = "relative";
+        banner.style.zIndex = "1000";
+        banner.textContent = message;
+
+        var content = document.getElementById("content") || document.body;
+        content.insertBefore(banner, content.firstChild);
+      });
+    }
+
+    function installFetchInterceptor() {
+      if (!window.fetch) {
+        return;
+      }
+
+      var originalFetch = window.fetch;
+
+      window.fetch = function () {
+        return originalFetch.apply(this, arguments).then(function (response) {
+          if (response && response.status === 422) {
+            response.clone().text().then(function (body) {
+              reloadWithMessage(messageFromBody(body));
+            }).catch(function () {});
+          }
+
+          return response;
+        });
+      };
+    }
+
+    function installXhrInterceptor() {
+      var originalOpen = XMLHttpRequest.prototype.open;
+
+      XMLHttpRequest.prototype.open = function () {
+        this.addEventListener("load", function () {
+          if (this.status === 422) {
+            reloadWithMessage(messageFromBody(this.responseText));
+          }
+        });
+
+        return originalOpen.apply(this, arguments);
+      };
+    }
+
+    showStoredMessage();
+    installFetchInterceptor();
+    installXhrInterceptor();
+  }());
+<% end %>

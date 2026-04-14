@@ -19,6 +19,14 @@ module OpenProject
         name "Work package required fields"
         description "Conditional required field rules for OpenProject work packages"
         version OpenProject::WorkPackageRequiredFields::VERSION
+
+        menu :admin_menu,
+             :work_package_required_fields,
+             { controller: "/admin/work_package_required_fields_settings", action: "show" },
+             caption: ->(*) { I18n.t("openproject_work_package_required_fields.admin.title") },
+             parent: :admin_work_packages,
+             if: ->(*) { User.current.admin? }
+
       end
 
       initializer "openproject_work_package_required_fields.load_hook" do
@@ -27,6 +35,7 @@ module OpenProject
           OpenProject::WorkPackageRequiredFields::Hooks.apply!
         end
       end
+
     end
   end
 end

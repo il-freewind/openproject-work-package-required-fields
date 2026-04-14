@@ -3,6 +3,8 @@
 /log/
 /pkg/
 /tmp/
+/app/assets/
+/public/
 /.idea/
 /.vscode/
 *.gem
@@ -11,4 +13,10 @@
 *.sqlite3
 *.swp
 *.swo
-
+.tmp.*
+.tmp.package/
+*.tmp
+*~
+*.tar.gz
+*.tgz
+*.zip

@@ -4,3 +4,32 @@ en:
       openproject_work_package_required_fields:
         name: "Work package required fields"
         description: "Conditional required field rules for OpenProject work packages"
+  openproject_work_package_required_fields:
+    admin:
+      title: "Required fields"
+      description: "Select the projects for which required field validation on work package status transitions should be active."
+      table:
+        enabled: "Enabled"
+    project:
+      title: "Required fields"
+      description: "Define which fields must be filled in when a work package is moved to a target status."
+      table:
+        type: "Work package type"
+        status: "Target status"
+        field: "Required field"
+        actions: "Actions"
+      actions:
+        add_row: "Add row"
+        remove_row: "Remove"
+    fields:
+      groups:
+        standard: "Standard fields"
+        custom: "Custom fields"
+    flash:
+      admin_updated: "Required field settings were updated."
+      project_updated: "Project required field rules were updated."
+      project_not_enabled: "This project is not enabled for required field rules."
+    errors:
+      required_fields_missing: "cannot be changed until the required fields are filled in: %{fields}"
+      incomplete_rule: "Each rule row must contain a work package type, a target status and a field."
+      invalid_field: "The selected required field is not available for this project."

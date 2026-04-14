@@ -1,0 +1,115 @@
+<% html_title I18n.t("openproject_work_package_required_fields.project.title") %>
+
+<%= render(Settings::ProjectWorkPackages::HeaderComponent.new(@project)) %>
+
+<p><%= I18n.t("openproject_work_package_required_fields.project.description") %></p>
+
+<%= form_with url: project_settings_work_packages_required_fields_path(@project), method: :put, local: true do %>
+  <table class="generic-table" id="required-fields-rules-table">
+    <thead>
+      <tr>
+        <th><%= I18n.t("openproject_work_package_required_fields.project.table.type") %></th>
+        <th><%= I18n.t("openproject_work_package_required_fields.project.table.status") %></th>
+        <th><%= I18n.t("openproject_work_package_required_fields.project.table.field") %></th>
+        <th><%= I18n.t("openproject_work_package_required_fields.project.table.actions") %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @rows.each do |row| %>
+        <tr>
+          <td>
+            <%= select_tag "rules[][type_id]",
+                           options_from_collection_for_select(@types, :id, :name, row[:type_id]),
+                           include_blank: true %>
+          </td>
+          <td>
+            <%= select_tag "rules[][status_id]",
+                           options_from_collection_for_select(@statuses, :id, :name, row[:status_id]),
+                           include_blank: true %>
+          </td>
+          <td>
+            <%= select_tag "rules[][field_key]",
+                           grouped_options_for_select(@field_options, row[:field_key]),
+                           include_blank: true %>
+          </td>
+          <td>
+            <button type="button" class="button -with-icon icon-delete remove-rule-row">
+              <%= I18n.t("openproject_work_package_required_fields.project.actions.remove_row") %>
+            </button>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <p class="form--actions">
+    <button type="button" class="button" id="add-required-field-rule-row">
+      <%= I18n.t("openproject_work_package_required_fields.project.actions.add_row") %>
+    </button>
+    <%= submit_tag I18n.t(:button_save) %>
+  </p>
+<% end %>
+
+<template id="required-field-rule-row-template">
+  <tr>
+    <td>
+      <%= select_tag "rules[][type_id]",
+                     options_from_collection_for_select(@types, :id, :name),
+                     include_blank: true %>
+    </td>
+    <td>
+      <%= select_tag "rules[][status_id]",
+                     options_from_collection_for_select(@statuses, :id, :name),
+                     include_blank: true %>
+    </td>
+    <td>
+      <%= select_tag "rules[][field_key]",
+                     grouped_options_for_select(@field_options),
+                     include_blank: true %>
+    </td>
+    <td>
+      <button type="button" class="button -with-icon icon-delete remove-rule-row">
+        <%= I18n.t("openproject_work_package_required_fields.project.actions.remove_row") %>
+      </button>
+    </td>
+  </tr>
+</template>
+
+<%= javascript_tag nonce: true do %>
+  function initializeRequiredFieldsSettings() {
+    var tableBody = document.querySelector("#required-fields-rules-table tbody");
+    var addButton = document.getElementById("add-required-field-rule-row");
+    var template = document.getElementById("required-field-rule-row-template");
+
+    if (!tableBody || !addButton || !template) {
+      return;
+    }
+
+    if (tableBody.dataset.requiredFieldsInitialized === "true") {
+      return;
+    }
+
+    tableBody.dataset.requiredFieldsInitialized = "true";
+
+    addButton.addEventListener("click", function () {
+      tableBody.insertAdjacentHTML("beforeend", template.innerHTML.trim());
+    });
+
+    tableBody.addEventListener("click", function (event) {
+      var button = event.target.closest(".remove-rule-row");
+
+      if (!button) {
+        return;
+      }
+
+      var row = button.closest("tr");
+
+      if (row) {
+        row.remove();
+      }
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", initializeRequiredFieldsSettings);
+  document.addEventListener("turbo:load", initializeRequiredFieldsSettings);
+<% end %>
